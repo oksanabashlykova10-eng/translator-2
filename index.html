@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Редактор переводчика</title>
+<title>Translator Editor</title>
 
 <style>
 * { box-sizing: border-box; }
@@ -10,17 +10,19 @@
 body {
   margin: 0;
   height: 100vh;
-  font-family: "Courier New", monospace;
+  font-family: Inter, Arial, sans-serif;
   background: radial-gradient(circle at top, #0b0f1f, #02030a);
-  color: #cfe3ff;
+  color: #e9f0ff;
 }
 
+/* ===== LAYOUT ===== */
 .app {
   display: grid;
   grid-template-columns: 360px 1fr 420px;
   height: 100vh;
 }
 
+/* ===== PANELS ===== */
 .panel {
   padding: 18px;
   overflow-y: auto;
@@ -34,30 +36,28 @@ body {
   align-items: center;
 }
 
+/* ===== UI ===== */
 h2 {
+  margin: 0 0 14px;
   font-size: 12px;
-  letter-spacing: .2em;
+  letter-spacing: .18em;
   text-transform: uppercase;
   color: #9fb8ff;
-  margin-bottom: 14px;
 }
 
 label {
-  font-size: 12px;
-  opacity: .8;
   display: block;
-  margin-top: 12px;
+  margin-top: 14px;
+  font-size: 12px;
+  opacity: .85;
 }
 
 input, textarea {
   width: 100%;
+  padding: 9px;
   margin-top: 6px;
-  padding: 8px;
-  background: #02030a;
-  border: 1px solid #2e3a6d;
-  color: #cfe3ff;
-  font-family: inherit;
-  font-size: 13px;
+  border-radius: 8px;
+  border: none;
 }
 
 textarea { resize: vertical; }
@@ -65,39 +65,45 @@ textarea { resize: vertical; }
 button {
   width: 100%;
   margin-top: 14px;
-  padding: 10px;
-  background: #02030a;
-  border: 1px solid #3a4aa0;
-  color: #9fb8ff;
-  font-family: inherit;
-  letter-spacing: .15em;
-  cursor: pointer;
-}
-
-button.primary {
-  background: linear-gradient(135deg, #11ff00, #7CFF00);
-  color: #021400;
+  padding: 12px;
+  border-radius: 999px;
   border: none;
+  cursor: pointer;
+  font-size: 14px;
 }
 
-button.toggle.on {
-  background: #11ff00;
-  color: #021400;
+.primary {
+  background: #ff8a00;
+  color: #fff;
 }
 
+.toggle {
+  background: #333;
+  color: #fff;
+}
+
+.toggle.on {
+  background: #ff8a00;
+}
+
+/* ===== PREVIEW ===== */
 iframe {
   width: 420px;
   height: 420px;
   border: none;
-  background: #02030a;
+  background: transparent;
 }
 
+/* ===== CODE ===== */
 #code {
   width: 100%;
   height: calc(100vh - 60px);
   background: #02030a;
   color: #7cffd8;
+  font-family: monospace;
   font-size: 12px;
+  padding: 12px;
+  border: none;
 }
 </style>
 </head>
@@ -106,41 +112,47 @@ iframe {
 
 <div class="app">
 
-<!-- НАСТРОЙКИ -->
+<!-- SETTINGS -->
 <div class="panel">
-  <h2>Редактор</h2>
+  <h2>Editor</h2>
 
-  <label>Цвет корпуса</label>
-  <input type="color" id="bg" value="#050714">
+  <label>Background (outside)</label>
+  <input type="color" id="bgOuter" value="#1a1a1a">
 
-  <label>Цвет текста</label>
-  <input type="color" id="text" value="#cfe3ff">
+  <label>Card color</label>
+  <input type="color" id="bgCard" value="#f6f2cc">
 
-  <label>Акцент</label>
-  <input type="color" id="accent" value="#11ff00">
+  <label>Input background</label>
+  <input type="color" id="bgInput" value="#ffffff">
 
-  <button id="neonToggle" class="toggle on">НЕОН: ВКЛ</button>
+  <label>Text color</label>
+  <input type="color" id="text" value="#333333">
 
-  <label>Цвет свечения</label>
-  <input type="color" id="glow" value="#11ff00">
+  <label>Accent (buttons)</label>
+  <input type="color" id="accent" value="#ff8a00">
 
-  <label>Аватарка (URL)</label>
+  <button id="neonToggle" class="toggle on">Neon: ON</button>
+
+  <label>Neon color</label>
+  <input type="color" id="glow" value="#ffb347">
+
+  <label>Avatar (URL)</label>
   <input type="text" id="image"
     value="https://cdn-icons-png.flaticon.com/512/4712/4712109.png">
 
-  <label>Скругление</label>
-  <input type="number" id="radius" value="6">
+  <label>Corner radius</label>
+  <input type="number" id="radius" value="22">
 
-  <label>Громкость</label>
+  <label>Volume (0–1)</label>
   <input type="number" id="volume" min="0" max="1" step="0.1" value="0.8">
 
-  <label>Слова (en = ru)</label>
+  <label>Dictionary (en = ru)</label>
   <textarea id="dict" rows="6">water = вода
 fire = огонь
 book = книга
 music = музыка</textarea>
 
-  <button id="copy" class="primary">Скопировать iframe</button>
+  <button id="copy" class="primary">Copy iframe</button>
 </div>
 
 <!-- PREVIEW -->
@@ -150,7 +162,7 @@ music = музыка</textarea>
 
 <!-- CODE -->
 <div class="panel">
-  <h2>IFRAME</h2>
+  <h2>iframe</h2>
   <textarea id="code" readonly></textarea>
 </div>
 
@@ -163,7 +175,7 @@ const $ = id => document.getElementById(id);
 $("neonToggle").onclick = () => {
   neon = !neon;
   $("neonToggle").classList.toggle("on", neon);
-  $("neonToggle").textContent = neon ? "НЕОН: ВКЛ" : "НЕОН: ВЫКЛ";
+  $("neonToggle").textContent = neon ? "Neon: ON" : "Neon: OFF";
   generate();
 };
 
@@ -178,7 +190,9 @@ function generate() {
     if (p.length === 2) dict[p[0].trim().toLowerCase()] = p[1].trim();
   });
 
-  const glow = neon ? `0 0 20px ${$("glow").value}` : "none";
+  const glow = neon
+    ? `0 0 30px ${$("glow").value}`
+    : `none`;
 
   const inner = `
 <div style="
@@ -187,51 +201,59 @@ function generate() {
   display:flex;
   justify-content:center;
   align-items:center;
-  background:#02030a;
-  font-family:'Courier New', monospace;
+  background:${$("bgOuter").value};
+  font-family:Arial;
 ">
   <div style="
     width:360px;
-    padding:18px;
-    background:${$("bg").value};
+    padding:22px;
+    background:${$("bgCard").value};
     color:${$("text").value};
-    border:2px solid ${$("accent").value};
-    box-shadow:${glow};
     border-radius:${$("radius").value}px;
+    box-shadow:${glow};
+    text-align:center;
   ">
 
-    <div style="text-align:center;margin-bottom:12px">
-      <img src="${$("image").value}"
-        style="width:64px;height:64px;border-radius:50%;
-        box-shadow:0 0 12px ${$("accent").value}">
-    </div>
+    <img src="${$("image").value}"
+      style="width:64px;height:64px;border-radius:50%;margin-bottom:12px">
 
-    <div style="opacity:.6;font-size:12px;margin-bottom:6px">
-      SIGNAL INPUT
-    </div>
-
-    <input id="word" placeholder="ENTER CODE WORD"
-      style="width:100%;padding:10px;
-      background:#02030a;border:1px solid ${$("accent").value};
-      color:${$("text").value};">
+    <input id="word"
+      placeholder="Type one English word"
+      style="
+        width:100%;
+        padding:12px;
+        border-radius:${$("radius").value}px;
+        border:none;
+        background:${$("bgInput").value};
+      ">
 
     <button id="translate"
-      style="width:100%;margin-top:12px;
-      background:${$("accent").value};border:none;color:#021400;">
-      DECODE
+      style="
+        width:100%;
+        margin-top:12px;
+        padding:12px;
+        background:${$("accent").value};
+        color:#fff;
+        border:none;
+        border-radius:${$("radius").value}px;
+      ">
+      Translate
     </button>
 
     <button id="speak"
-      style="width:100%;margin-top:8px;
-      background:#02030a;border:1px solid ${$("accent").value};
-      color:${$("text").value};">
-      AUDIO
+      style="
+        width:100%;
+        margin-top:10px;
+        padding:12px;
+        background:${$("accent").value};
+        color:#fff;
+        border:none;
+        border-radius:${$("radius").value}px;
+      ">
+      🔊 Speak
     </button>
 
-    <div id="result"
-      style="margin-top:14px;padding:10px;
-      border:1px dashed ${$("accent").value};min-height:36px">
-    </div>
+    <div id="result" style="margin-top:14px"></div>
 
   </div>
 </div>
@@ -242,9 +264,7 @@ const VOLUME = ${$("volume").value};
 
 translate.onclick = () => {
   const v = word.value.trim().toLowerCase();
-  result.textContent = (!v || v.includes(" "))
-    ? "INVALID INPUT"
-    : (DICTIONARY[v] || "NO DATA");
+  result.textContent = DICTIONARY[v] || "Введите одно слово";
 };
 
 speak.onclick = () => {
@@ -267,7 +287,7 @@ generate();
 
 $("copy").onclick = () => {
   navigator.clipboard.writeText($("code").value);
-  alert("Готово");
+  alert("Copied");
 };
 </script>
 
