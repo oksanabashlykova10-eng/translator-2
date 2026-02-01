@@ -10,19 +10,17 @@
 body {
   margin: 0;
   height: 100vh;
-  font-family: Inter, Arial, sans-serif;
+  font-family: "Courier New", monospace;
   background: radial-gradient(circle at top, #0b0f1f, #02030a);
-  color: #e9f0ff;
+  color: #cfe3ff;
 }
 
-/* ===== LAYOUT ===== */
 .app {
   display: grid;
   grid-template-columns: 360px 1fr 420px;
   height: 100vh;
 }
 
-/* ===== PANELS ===== */
 .panel {
   padding: 18px;
   overflow-y: auto;
@@ -36,30 +34,29 @@ body {
   align-items: center;
 }
 
-/* ===== UI ===== */
 h2 {
-  margin: 0 0 14px;
   font-size: 12px;
-  letter-spacing: .18em;
+  letter-spacing: .2em;
   text-transform: uppercase;
   color: #9fb8ff;
+  margin-bottom: 14px;
 }
 
 label {
-  display: block;
-  margin-top: 14px;
   font-size: 12px;
-  opacity: .85;
+  opacity: .8;
+  display: block;
+  margin-top: 12px;
 }
 
 input, textarea {
   width: 100%;
-  padding: 9px;
   margin-top: 6px;
-  border-radius: 6px;
+  padding: 8px;
+  background: #02030a;
   border: 1px solid #2e3a6d;
-  background: #050714;
-  color: #e9f0ff;
+  color: #cfe3ff;
+  font-family: inherit;
   font-size: 13px;
 }
 
@@ -68,29 +65,26 @@ textarea { resize: vertical; }
 button {
   width: 100%;
   margin-top: 14px;
-  padding: 12px;
-  border-radius: 6px;
+  padding: 10px;
+  background: #02030a;
   border: 1px solid #3a4aa0;
-  background: #0a1030;
   color: #9fb8ff;
+  font-family: inherit;
+  letter-spacing: .15em;
   cursor: pointer;
-  font-size: 12px;
-  letter-spacing: .12em;
-  text-transform: uppercase;
 }
 
 button.primary {
-  background: linear-gradient(135deg, #ffb347, #ff7b00);
-  color: #120700;
+  background: linear-gradient(135deg, #11ff00, #7CFF00);
+  color: #021400;
   border: none;
 }
 
 button.toggle.on {
-  background: #ff7b00;
-  color: #120700;
+  background: #11ff00;
+  color: #021400;
 }
 
-/* ===== PREVIEW ===== */
 iframe {
   width: 420px;
   height: 420px;
@@ -98,16 +92,12 @@ iframe {
   background: #02030a;
 }
 
-/* ===== CODE ===== */
 #code {
   width: 100%;
   height: calc(100vh - 60px);
   background: #02030a;
   color: #7cffd8;
-  font-family: monospace;
   font-size: 12px;
-  padding: 12px;
-  border: none;
 }
 </style>
 </head>
@@ -116,7 +106,7 @@ iframe {
 
 <div class="app">
 
-<!-- SETTINGS -->
+<!-- НАСТРОЙКИ -->
 <div class="panel">
   <h2>Редактор</h2>
 
@@ -124,7 +114,7 @@ iframe {
   <input type="color" id="bg" value="#050714">
 
   <label>Цвет текста</label>
-  <input type="color" id="text" value="#9fb8ff">
+  <input type="color" id="text" value="#cfe3ff">
 
   <label>Акцент</label>
   <input type="color" id="accent" value="#11ff00">
@@ -140,9 +130,6 @@ iframe {
 
   <label>Скругление</label>
   <input type="number" id="radius" value="6">
-
-  <label>Размер шрифта</label>
-  <input type="number" id="fontSize" value="16">
 
   <label>Громкость</label>
   <input type="number" id="volume" min="0" max="1" step="0.1" value="0.8">
@@ -163,7 +150,7 @@ music = музыка</textarea>
 
 <!-- CODE -->
 <div class="panel">
-  <h2>iframe</h2>
+  <h2>IFRAME</h2>
   <textarea id="code" readonly></textarea>
 </div>
 
@@ -191,7 +178,7 @@ function generate() {
     if (p.length === 2) dict[p[0].trim().toLowerCase()] = p[1].trim();
   });
 
-  const glow = neon ? `0 0 20px ${$("glow").value}` : `none`;
+  const glow = neon ? `0 0 20px ${$("glow").value}` : "none";
 
   const inner = `
 <div style="
@@ -223,51 +210,27 @@ function generate() {
       SIGNAL INPUT
     </div>
 
-    <input id="word"
-      placeholder="ENTER CODE WORD"
-      style="
-        width:100%;
-        padding:10px;
-        background:#02030a;
-        border:1px solid ${$("accent").value};
-        color:${$("text").value};
-        font-family:inherit;
-      ">
+    <input id="word" placeholder="ENTER CODE WORD"
+      style="width:100%;padding:10px;
+      background:#02030a;border:1px solid ${$("accent").value};
+      color:${$("text").value};">
 
     <button id="translate"
-      style="
-        width:100%;
-        margin-top:12px;
-        padding:10px;
-        background:${$("accent").value};
-        border:none;
-        color:#120700;
-        font-family:inherit;
-        letter-spacing:.12em;
-      ">
+      style="width:100%;margin-top:12px;
+      background:${$("accent").value};border:none;color:#021400;">
       DECODE
     </button>
 
     <button id="speak"
-      style="
-        width:100%;
-        margin-top:8px;
-        padding:10px;
-        background:#0a1030;
-        border:1px solid ${$("accent").value};
-        color:${$("text").value};
-        font-family:inherit;
-      ">
+      style="width:100%;margin-top:8px;
+      background:#02030a;border:1px solid ${$("accent").value};
+      color:${$("text").value};">
       AUDIO
     </button>
 
     <div id="result"
-      style="
-        margin-top:14px;
-        padding:10px;
-        border:1px dashed ${$("accent").value};
-        min-height:36px;
-      ">
+      style="margin-top:14px;padding:10px;
+      border:1px dashed ${$("accent").value};min-height:36px">
     </div>
 
   </div>
@@ -279,9 +242,9 @@ const VOLUME = ${$("volume").value};
 
 translate.onclick = () => {
   const v = word.value.trim().toLowerCase();
-  result.textContent =
-    (!v || v.includes(" ")) ? "INVALID INPUT" :
-    (DICTIONARY[v] || "NO DATA");
+  result.textContent = (!v || v.includes(" "))
+    ? "INVALID INPUT"
+    : (DICTIONARY[v] || "NO DATA");
 };
 
 speak.onclick = () => {
