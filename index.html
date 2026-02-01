@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Translator Widget Editor</title>
+<title>Translator Editor</title>
 
 <style>
 * { box-sizing: border-box; }
@@ -10,22 +10,35 @@
 body {
   margin: 0;
   height: 100vh;
-  font-family: Inter, Arial, sans-serif;
+  font-family: "Courier New", monospace;
   background: radial-gradient(circle at top, #0b0f1f, #02030a);
-  color: #e9f0ff;
+  color: #cfe3ff;
+  overflow: hidden;
 }
 
+/* ===== SPARKLES BACKGROUND ===== */
+canvas#fx {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ===== LAYOUT ===== */
 .app {
+  position: relative;
+  z-index: 1;
   display: grid;
-  grid-template-columns: 360px 1fr 420px;
+  grid-template-columns: 360px 1fr 560px; /* ⬅️ код стал шире */
   height: 100vh;
 }
 
+/* ===== PANELS ===== */
 .panel {
   padding: 18px;
   overflow-y: auto;
-  background: rgba(4,6,20,.75);
-  border: 1px solid rgba(120,160,255,.12);
+  background: rgba(4,6,20,.78);
+  border: 1px solid rgba(120,160,255,.15);
 }
 
 .preview {
@@ -34,6 +47,7 @@ body {
   align-items: center;
 }
 
+/* ===== UI ===== */
 h2 {
   margin: 0 0 14px;
   font-size: 12px;
@@ -67,48 +81,66 @@ button {
   margin-top: 14px;
   padding: 12px;
   border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.primary {
-  background: #ff8a00;
-  color: #120700;
-}
-
-.toggle {
+  border: 1px solid #3a4aa0;
   background: #0a1030;
   color: #9fb8ff;
-  border: 1px solid #3a4aa0;
+  cursor: pointer;
+  font-size: 12px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
 }
 
-.toggle.on {
-  background: #11ff00;
-  color: #02030a;
+button.primary {
+  background: linear-gradient(135deg, #ffb347, #ff7b00);
+  color: #120700;
+  border: none;
 }
 
+button.toggle.on {
+  background: #39ff14;
+  color: #001400;
+}
+
+/* ===== PREVIEW ===== */
 iframe {
   width: 420px;
   height: 420px;
   border: none;
+  background: transparent;
+}
+
+/* ===== CODE (NEON) ===== */
+#code {
+  width: 100%;
+  height: calc(100vh - 60px);
+  background: #02030a;
+  color: #39ff14;
+  font-family: "Courier New", monospace;
+  font-size: 13px;
+  padding: 16px;
+  border: none;
+  text-shadow:
+    0 0 4px #39ff14,
+    0 0 12px rgba(57,255,20,.6);
 }
 </style>
 </head>
 
 <body>
 
+<canvas id="fx"></canvas>
+
 <div class="app">
 
 <!-- SETTINGS -->
 <div class="panel">
-  <h2>Editor</h2>
+  <h2>EDITOR</h2>
 
   <label>Card color</label>
-  <input type="color" id="cardBg" value="#f6f1c9">
+  <input type="color" id="panelBg" value="#050714">
 
   <label>Text color</label>
-  <input type="color" id="text" value="#333333">
+  <input type="color" id="text" value="#cfe3ff">
 
   <label>Accent (buttons)</label>
   <input type="color" id="accent" value="#ff8a00">
@@ -116,7 +148,7 @@ iframe {
   <button id="neonToggle" class="toggle on">Neon: ON</button>
 
   <label>Neon color</label>
-  <input type="color" id="glow" value="#ffb347">
+  <input type="color" id="glow" value="#ff8a00">
 
   <label>Avatar (URL)</label>
   <input type="text" id="image"
@@ -126,7 +158,7 @@ iframe {
   <input type="number" id="radius" value="22">
 
   <label>Volume (0–1)</label>
-  <input type="number" id="volume" min="0" max="1" step="0.1" value="0.8">
+  <input type="number" id="volume" step="0.1" min="0" max="1" value="0.8">
 
   <label>Dictionary (en = ru)</label>
   <textarea id="dict" rows="6">water = вода
@@ -134,7 +166,7 @@ fire = огонь
 book = книга
 music = музыка</textarea>
 
-  <button id="copy" class="primary">📋 Copy iframe</button>
+  <button id="copy" class="primary">Copy iframe</button>
 </div>
 
 <!-- PREVIEW -->
@@ -151,6 +183,39 @@ music = музыка</textarea>
 </div>
 
 <script>
+/* ===== SPARKLES ===== */
+const c = document.getElementById("fx");
+const ctx = c.getContext("2d");
+let w, h;
+function resize(){
+  w = c.width = window.innerWidth;
+  h = c.height = window.innerHeight;
+}
+window.addEventListener("resize", resize);
+resize();
+
+const sparks = Array.from({length: 80}, () => ({
+  x: Math.random()*w,
+  y: Math.random()*h,
+  r: Math.random()*1.5+0.3,
+  s: Math.random()*0.3+0.1
+}));
+
+function draw(){
+  ctx.clearRect(0,0,w,h);
+  sparks.forEach(p=>{
+    p.y -= p.s;
+    if(p.y<0) p.y = h;
+    ctx.fillStyle = "rgba(120,160,255,.35)";
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fill();
+  });
+  requestAnimationFrame(draw);
+}
+draw();
+
+/* ===== EDITOR LOGIC ===== */
 let neon = true;
 const $ = id => document.getElementById(id);
 
@@ -162,110 +227,71 @@ $("neonToggle").onclick = () => {
 };
 
 document.querySelectorAll("input, textarea")
-  .forEach(el => el.addEventListener("input", generate));
+  .forEach(e => e.addEventListener("input", generate));
 
-function generate() {
+function generate(){
   const dict = {};
-  $("dict").value.split("\n").forEach(l => {
-    const p = l.split("=");
-    if (p.length === 2) dict[p[0].trim().toLowerCase()] = p[1].trim();
+  $("dict").value.split("\n").forEach(l=>{
+    const p=l.split("=");
+    if(p[1]) dict[p[0].trim().toLowerCase()] = p[1].trim();
   });
 
-  const glow = neon ? `0 0 35px ${$("glow").value}` : "none";
+  const glow = neon ? `0 0 30px ${$("glow").value}` : "none";
 
   const inner = `
-<div style="
-  width:100%;
-  height:100%;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-family:Inter,Arial,sans-serif;
-">
+<div style="width:100%;height:100%;display:flex;justify-content:center;align-items:center;">
   <div style="
     width:360px;
     padding:22px;
-    background:${$("cardBg").value};
+    background:${$("panelBg").value};
     color:${$("text").value};
     border-radius:${$("radius").value}px;
     box-shadow:${glow};
     text-align:center;
+    font-family:Arial;
   ">
-
-    <img src="${$("image").value}"
-      style="width:64px;height:64px;border-radius:50%;margin-bottom:12px">
-
-    <input id="word"
-      placeholder="Type one English word"
-      style="
-        width:100%;
-        padding:12px;
-        border-radius:${$("radius").value}px;
-        border:none;
-        margin-bottom:12px;
-      ">
-
+    <img src="${$("image").value}" style="width:64px;height:64px;border-radius:50%;margin-bottom:12px">
+    <input id="word" placeholder="Type one English word"
+      style="width:100%;padding:12px;border-radius:${$("radius").value}px;border:none">
     <button id="translate"
-      style="
-        width:100%;
-        padding:14px;
-        background:${$("accent").value};
-        color:white;
-        border:none;
-        border-radius:${$("radius").value}px;
-        font-size:16px;
-      ">
+      style="width:100%;margin-top:10px;padding:12px;
+      background:${$("accent").value};color:#fff;border:none;border-radius:${$("radius").value}px">
       Translate
     </button>
-
     <button id="speak"
-      style="
-        width:100%;
-        margin-top:10px;
-        padding:14px;
-        background:${$("accent").value};
-        color:white;
-        border:none;
-        border-radius:${$("radius").value}px;
-        font-size:16px;
-      ">
+      style="width:100%;margin-top:10px;padding:12px;
+      background:${$("accent").value};color:#fff;border:none;border-radius:${$("radius").value}px">
       🔊 Speak
     </button>
-
     <div id="result" style="margin-top:12px"></div>
   </div>
 </div>
 
 <script>
-const DICT = ${JSON.stringify(dict)};
-const VOLUME = ${$("volume").value};
-
-translate.onclick = () => {
-  const v = word.value.trim().toLowerCase();
-  result.textContent = DICT[v] || "";
+const DICTIONARY=${JSON.stringify(dict)};
+const VOLUME=${$("volume").value};
+translate.onclick=()=>{
+  const v=word.value.trim().toLowerCase();
+  result.textContent=DICTIONARY[v]||"";
 };
-
-speak.onclick = () => {
-  if (!word.value) return;
-  const u = new SpeechSynthesisUtterance(word.value);
-  u.lang = "en-US";
-  u.volume = VOLUME;
+speak.onclick=()=>{
+  if(!word.value)return;
+  const u=new SpeechSynthesisUtterance(word.value);
+  u.lang="en-US";u.volume=VOLUME;
   speechSynthesis.speak(u);
 };
-<\/script>
-`;
+<\/script>`;
 
   $("preview").srcdoc = inner;
   $("code").value =
 `<iframe srcdoc="${inner.replace(/"/g,'&quot;')}"
 style="width:100%;height:500px;border:none"></iframe>`;
 }
-
 generate();
 
-$("copy").onclick = () => {
+$("copy").onclick = ()=>{
   navigator.clipboard.writeText($("code").value);
-  alert("Copied ✅");
+  alert("Copied");
 };
 </script>
 
