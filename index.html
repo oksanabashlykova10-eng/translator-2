@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru">
 <head>
 <meta charset="UTF-8">
 <title>Translator Editor</title>
@@ -16,8 +16,8 @@ body {
   overflow: hidden;
 }
 
-/* ===== SPARKLES ===== */
-canvas#fx {
+/* ===== NEON SPARKLES CANVAS ===== */
+#fx {
   position: fixed;
   inset: 0;
   z-index: 0;
@@ -109,7 +109,7 @@ iframe {
   background: transparent;
 }
 
-/* ===== CODE (NEON) ===== */
+/* ===== CODE (NEON TEXT) ===== */
 #code {
   width: 100%;
   height: calc(100vh - 60px);
@@ -121,7 +121,7 @@ iframe {
   border: none;
   text-shadow:
     0 0 4px #39ff14,
-    0 0 12px rgba(57,255,20,.6);
+    0 0 14px rgba(57,255,20,.7);
 }
 </style>
 </head>
@@ -158,7 +158,7 @@ iframe {
   <input type="number" id="radius" value="22">
 
   <label>Volume (0–1)</label>
-  <input type="number" id="volume" step="0.1" min="0" max="1" value="0.8">
+  <input type="number" id="volume" min="0" max="1" step="0.1" value="0.8">
 
   <label>Dictionary (en = ru)</label>
   <textarea id="dict" rows="6">water = вода
@@ -183,40 +183,55 @@ music = музыка</textarea>
 </div>
 
 <script>
-/* ===== SPARKLES ===== */
-const c = document.getElementById("fx");
-const ctx = c.getContext("2d");
-let w, h;
+/* ===== NEON SPARKLES ===== */
+const canvas = document.getElementById("fx");
+const ctx = canvas.getContext("2d");
 
-function resize(){
-  w = c.width = window.innerWidth;
-  h = c.height = window.innerHeight;
+let w, h;
+function resize() {
+  w = canvas.width = window.innerWidth;
+  h = canvas.height = window.innerHeight;
 }
 window.addEventListener("resize", resize);
 resize();
 
-const sparks = Array.from({length: 90}, () => ({
-  x: Math.random()*w,
-  y: Math.random()*h,
-  r: Math.random()*1.6 + 0.4,
-  s: Math.random()*0.4 + 0.1
+const sparks = Array.from({ length: 120 }, () => ({
+  x: Math.random() * w,
+  y: Math.random() * h,
+  r: Math.random() * 2 + 0.6,
+  vx: (Math.random() - 0.5) * 0.15,
+  vy: Math.random() * -0.4 - 0.1,
+  a: Math.random() * Math.PI * 2
 }));
 
-function draw(){
-  ctx.clearRect(0,0,w,h);
-  sparks.forEach(p=>{
-    p.y -= p.s;
-    if(p.y < 0) p.y = h;
-    ctx.fillStyle = "rgba(120,160,255,.35)";
+function animateSparks() {
+  ctx.clearRect(0, 0, w, h);
+
+  sparks.forEach(p => {
+    p.x += p.vx;
+    p.y += p.vy;
+    p.a += 0.015;
+
+    if (p.y < -10) {
+      p.y = h + 10;
+      p.x = Math.random() * w;
+    }
+
+    const alpha = 0.5 + Math.sin(p.a) * 0.4;
+
     ctx.beginPath();
-    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle = `rgba(120,180,255,${alpha})`;
+    ctx.shadowColor = "rgba(120,180,255,0.9)";
+    ctx.shadowBlur = 14;
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
     ctx.fill();
   });
-  requestAnimationFrame(draw);
-}
-draw();
 
-/* ===== EDITOR ===== */
+  requestAnimationFrame(animateSparks);
+}
+animateSparks();
+
+/* ===== EDITOR LOGIC ===== */
 let neon = true;
 const $ = id => document.getElementById(id);
 
@@ -228,13 +243,13 @@ $("neonToggle").onclick = () => {
 };
 
 document.querySelectorAll("input, textarea")
-  .forEach(e => e.addEventListener("input", generate));
+  .forEach(el => el.addEventListener("input", generate));
 
-function generate(){
+function generate() {
   const dict = {};
-  $("dict").value.split("\n").forEach(l=>{
-    const p=l.split("=");
-    if(p[1]) dict[p[0].trim().toLowerCase()] = p[1].trim();
+  $("dict").value.split("\n").forEach(l => {
+    const p = l.split("=");
+    if (p[1]) dict[p[0].trim().toLowerCase()] = p[1].trim();
   });
 
   const glow = neon ? `0 0 30px ${$("glow").value}` : "none";
@@ -288,9 +303,10 @@ speak.onclick=()=>{
 `<iframe srcdoc="${inner.replace(/"/g,'&quot;')}"
 style="width:100%;height:500px;border:none"></iframe>`;
 }
+
 generate();
 
-$("copy").onclick = ()=>{
+$("copy").onclick = () => {
   navigator.clipboard.writeText($("code").value);
   alert("Copied");
 };
