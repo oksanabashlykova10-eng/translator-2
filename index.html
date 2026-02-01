@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Translator Editor</title>
+<title>Translator Editor – Neon Sparks</title>
 
 <style>
 * { box-sizing: border-box; }
@@ -16,7 +16,7 @@ body {
   overflow: hidden;
 }
 
-/* ===== NEON SPARKLES CANVAS ===== */
+/* ===== NEON SPARKLES ===== */
 #fx {
   position: fixed;
   inset: 0;
@@ -37,8 +37,8 @@ body {
 .panel {
   padding: 18px;
   overflow-y: auto;
-  background: rgba(4,6,20,.78);
-  border: 1px solid rgba(120,160,255,.15);
+  background: rgba(4,6,20,.8);
+  border: 1px solid rgba(120,160,255,.18);
 }
 
 .preview {
@@ -109,7 +109,7 @@ iframe {
   background: transparent;
 }
 
-/* ===== CODE (NEON TEXT) ===== */
+/* ===== CODE (NEON) ===== */
 #code {
   width: 100%;
   height: calc(100vh - 60px);
@@ -120,8 +120,8 @@ iframe {
   padding: 16px;
   border: none;
   text-shadow:
-    0 0 4px #39ff14,
-    0 0 14px rgba(57,255,20,.7);
+    0 0 6px #39ff14,
+    0 0 18px rgba(57,255,20,.8);
 }
 </style>
 </head>
@@ -183,7 +183,7 @@ music = музыка</textarea>
 </div>
 
 <script>
-/* ===== NEON SPARKLES ===== */
+/* ===== BIG CHAOTIC NEON SPARKLES ===== */
 const canvas = document.getElementById("fx");
 const ctx = canvas.getContext("2d");
 
@@ -195,41 +195,51 @@ function resize() {
 window.addEventListener("resize", resize);
 resize();
 
-const sparks = Array.from({ length: 120 }, () => ({
-  x: Math.random() * w,
-  y: Math.random() * h,
-  r: Math.random() * 2 + 0.6,
-  vx: (Math.random() - 0.5) * 0.15,
-  vy: Math.random() * -0.4 - 0.1,
-  a: Math.random() * Math.PI * 2
-}));
+const COLORS = [
+  [80,180,255],
+  [255,80,200],
+  [180,80,255],
+  [80,255,180],
+  [255,180,80]
+];
 
-function animateSparks() {
+const sparks = Array.from({ length: 70 }, () => {
+  const c = COLORS[Math.floor(Math.random() * COLORS.length)];
+  return {
+    x: Math.random() * w,
+    y: Math.random() * h,
+    r: Math.random() * 6 + 4,
+    vx: (Math.random() - 0.5) * 0.6,
+    vy: (Math.random() - 0.5) * 0.6,
+    a: Math.random() * Math.PI * 2,
+    c
+  };
+});
+
+function animate() {
   ctx.clearRect(0, 0, w, h);
 
   sparks.forEach(p => {
     p.x += p.vx;
     p.y += p.vy;
-    p.a += 0.015;
+    p.a += 0.04;
 
-    if (p.y < -10) {
-      p.y = h + 10;
-      p.x = Math.random() * w;
-    }
+    if (p.x < -50 || p.x > w + 50) p.vx *= -1;
+    if (p.y < -50 || p.y > h + 50) p.vy *= -1;
 
-    const alpha = 0.5 + Math.sin(p.a) * 0.4;
+    const alpha = 0.4 + Math.sin(p.a) * 0.4;
 
     ctx.beginPath();
-    ctx.fillStyle = `rgba(120,180,255,${alpha})`;
-    ctx.shadowColor = "rgba(120,180,255,0.9)";
-    ctx.shadowBlur = 14;
+    ctx.fillStyle = `rgba(${p.c[0]},${p.c[1]},${p.c[2]},${alpha})`;
+    ctx.shadowColor = `rgba(${p.c[0]},${p.c[1]},${p.c[2]},1)`;
+    ctx.shadowBlur = 22;
     ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
     ctx.fill();
   });
 
-  requestAnimationFrame(animateSparks);
+  requestAnimationFrame(animate);
 }
-animateSparks();
+animate();
 
 /* ===== EDITOR LOGIC ===== */
 let neon = true;
