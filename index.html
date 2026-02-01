@@ -35,8 +35,8 @@ body {
 
 .preview {
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
 }
 
 .code {
@@ -45,75 +45,60 @@ body {
 }
 
 /* ===== UI ===== */
-h2 {
-  margin: 0 0 16px;
-}
+h2 { margin: 0 0 16px; }
 
 label {
-  display: block;
-  margin-top: 14px;
-  font-size: 14px;
-  opacity: .9;
+  display:block;
+  margin-top:14px;
+  font-size:14px;
+  opacity:.9;
 }
 
 input, textarea {
-  width: 100%;
-  padding: 10px;
-  margin-top: 6px;
-  border-radius: 10px;
-  border: none;
-  outline: none;
+  width:100%;
+  padding:10px;
+  margin-top:6px;
+  border-radius:10px;
+  border:none;
 }
 
-textarea {
-  resize: vertical;
-}
+textarea { resize: vertical; }
 
 button {
-  width: 100%;
-  margin-top: 16px;
-  padding: 14px;
-  border-radius: 14px;
-  border: none;
-  cursor: pointer;
-  font-size: 15px;
-  font-weight: 600;
+  width:100%;
+  margin-top:16px;
+  padding:14px;
+  border-radius:14px;
+  border:none;
+  cursor:pointer;
+  font-size:15px;
+  font-weight:600;
 }
 
-.primary {
-  background: #ff8a00;
-  color: #fff;
-}
-
-.toggle {
-  background: #333;
-  color: #fff;
-}
-
-.toggle.on {
-  background: #ff8a00;
-}
+.primary { background:#ff8a00; color:#fff; }
+.toggle { background:#333; color:#fff; }
+.toggle.on { background:#ff8a00; }
 
 /* ===== PREVIEW ===== */
 iframe {
-  width: 420px;
-  height: 420px;
-  border-radius: 26px;
-  border: none;
-  background: #111;
-  box-shadow: 0 0 60px rgba(255,138,0,.25);
+  width:420px;
+  height:420px;
+  border:none;
+  border-radius:26px;
+  background:#111;
+  box-shadow:0 0 60px rgba(255,138,0,.25);
 }
 
 /* ===== CODE ===== */
 #code {
-  width: 100%;
-  height: calc(100vh - 60px);
-  background: #0b0f1a;
-  color: #7CFFB2;
-  font-family: monospace;
-  font-size: 13px;
-  border-radius: 14px;
-  padding: 14px;
+  width:100%;
+  height:calc(100vh - 60px);
+  background:#0b0f1a;
+  color:#7CFFB2;
+  font-family:monospace;
+  font-size:13px;
+  border-radius:14px;
+  padding:14px;
 }
 </style>
 </head>
@@ -157,8 +142,7 @@ iframe {
     <textarea id="dict" rows="6">water = вода
 fire = огонь
 book = книга
-music = музыка
-sun = солнце</textarea>
+music = музыка</textarea>
 
     <button id="copy" class="primary">📋 Скопировать iframe</button>
   </div>
@@ -255,8 +239,8 @@ speak.onclick = () => {
 
   $("preview").srcdoc = inner;
   $("code").value =
-`<iframe style="width:100%;height:500px;border:none"
-srcdoc="${inner.replace(/"/g,'&quot;')}"></iframe>`;
+`<iframe srcdoc="${inner.replace(/"/g,'&quot;')}"
+style="width:100%;height:500px;border:none"></iframe>`;
 }
 
 generate();
