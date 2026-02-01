@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>Translator Editor</title>
@@ -16,7 +16,7 @@ body {
   overflow: hidden;
 }
 
-/* ===== SPARKLES BACKGROUND ===== */
+/* ===== SPARKLES ===== */
 canvas#fx {
   position: fixed;
   inset: 0;
@@ -29,7 +29,7 @@ canvas#fx {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: 360px 1fr 560px; /* ⬅️ код стал шире */
+  grid-template-columns: 360px 1fr 560px;
   height: 100vh;
 }
 
@@ -187,6 +187,7 @@ music = музыка</textarea>
 const c = document.getElementById("fx");
 const ctx = c.getContext("2d");
 let w, h;
+
 function resize(){
   w = c.width = window.innerWidth;
   h = c.height = window.innerHeight;
@@ -194,18 +195,18 @@ function resize(){
 window.addEventListener("resize", resize);
 resize();
 
-const sparks = Array.from({length: 80}, () => ({
+const sparks = Array.from({length: 90}, () => ({
   x: Math.random()*w,
   y: Math.random()*h,
-  r: Math.random()*1.5+0.3,
-  s: Math.random()*0.3+0.1
+  r: Math.random()*1.6 + 0.4,
+  s: Math.random()*0.4 + 0.1
 }));
 
 function draw(){
   ctx.clearRect(0,0,w,h);
   sparks.forEach(p=>{
     p.y -= p.s;
-    if(p.y<0) p.y = h;
+    if(p.y < 0) p.y = h;
     ctx.fillStyle = "rgba(120,160,255,.35)";
     ctx.beginPath();
     ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
@@ -215,7 +216,7 @@ function draw(){
 }
 draw();
 
-/* ===== EDITOR LOGIC ===== */
+/* ===== EDITOR ===== */
 let neon = true;
 const $ = id => document.getElementById(id);
 
