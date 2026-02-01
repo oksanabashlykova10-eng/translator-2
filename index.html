@@ -11,7 +11,7 @@ body {
   margin: 0;
   height: 100vh;
   font-family: Inter, Arial, sans-serif;
-  background: radial-gradient(circle at top, #10131f, #02030a);
+  background: radial-gradient(circle at top, #0b0f1f, #02030a);
   color: #e9f0ff;
 }
 
@@ -26,24 +26,21 @@ body {
 .panel {
   padding: 18px;
   overflow-y: auto;
-  background: rgba(5,8,20,.75);
-  border: 1px solid rgba(120,160,255,.15);
+  background: rgba(4,6,20,.75);
+  border: 1px solid rgba(120,160,255,.12);
 }
-
-.settings { border-right: none; }
-.code { border-left: none; }
 
 .preview {
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
 }
 
 /* ===== UI ===== */
 h2 {
   margin: 0 0 14px;
-  font-size: 13px;
-  letter-spacing: .15em;
+  font-size: 12px;
+  letter-spacing: .18em;
   text-transform: uppercase;
   color: #9fb8ff;
 }
@@ -78,7 +75,7 @@ button {
   color: #9fb8ff;
   cursor: pointer;
   font-size: 12px;
-  letter-spacing: .1em;
+  letter-spacing: .12em;
   text-transform: uppercase;
 }
 
@@ -119,56 +116,56 @@ iframe {
 
 <div class="app">
 
-  <!-- SETTINGS -->
-  <div class="panel settings">
-    <h2>Редактор</h2>
+<!-- SETTINGS -->
+<div class="panel">
+  <h2>Редактор</h2>
 
-    <label>Цвет корпуса</label>
-    <input type="color" id="bg" value="#050714">
+  <label>Цвет корпуса</label>
+  <input type="color" id="bg" value="#050714">
 
-    <label>Цвет текста</label>
-    <input type="color" id="text" value="#9fb8ff">
+  <label>Цвет текста</label>
+  <input type="color" id="text" value="#9fb8ff">
 
-    <label>Акцент</label>
-    <input type="color" id="accent" value="#ff7b00">
+  <label>Акцент</label>
+  <input type="color" id="accent" value="#11ff00">
 
-    <button id="neonToggle" class="toggle on">Неон: ВКЛ</button>
+  <button id="neonToggle" class="toggle on">НЕОН: ВКЛ</button>
 
-    <label>Цвет свечения</label>
-    <input type="color" id="glow" value="#4da6ff">
+  <label>Цвет свечения</label>
+  <input type="color" id="glow" value="#11ff00">
 
-    <label>Картинка (URL)</label>
-    <input type="text" id="image"
-      value="https://cdn-icons-png.flaticon.com/512/4712/4712109.png">
+  <label>Аватарка (URL)</label>
+  <input type="text" id="image"
+    value="https://cdn-icons-png.flaticon.com/512/4712/4712109.png">
 
-    <label>Скругление</label>
-    <input type="number" id="radius" value="6">
+  <label>Скругление</label>
+  <input type="number" id="radius" value="6">
 
-    <label>Размер шрифта</label>
-    <input type="number" id="fontSize" value="16">
+  <label>Размер шрифта</label>
+  <input type="number" id="fontSize" value="16">
 
-    <label>Громкость</label>
-    <input type="number" id="volume" min="0" max="1" step="0.1" value="0.8">
+  <label>Громкость</label>
+  <input type="number" id="volume" min="0" max="1" step="0.1" value="0.8">
 
-    <label>Слова (en = ru)</label>
-    <textarea id="dict" rows="6">water = вода
+  <label>Слова (en = ru)</label>
+  <textarea id="dict" rows="6">water = вода
 fire = огонь
 book = книга
 music = музыка</textarea>
 
-    <button id="copy" class="primary">Скопировать iframe</button>
-  </div>
+  <button id="copy" class="primary">Скопировать iframe</button>
+</div>
 
-  <!-- PREVIEW -->
-  <div class="panel preview">
-    <iframe id="preview"></iframe>
-  </div>
+<!-- PREVIEW -->
+<div class="panel preview">
+  <iframe id="preview"></iframe>
+</div>
 
-  <!-- CODE -->
-  <div class="panel code">
-    <h2>iframe</h2>
-    <textarea id="code" readonly></textarea>
-  </div>
+<!-- CODE -->
+<div class="panel">
+  <h2>iframe</h2>
+  <textarea id="code" readonly></textarea>
+</div>
 
 </div>
 
@@ -179,7 +176,7 @@ const $ = id => document.getElementById(id);
 $("neonToggle").onclick = () => {
   neon = !neon;
   $("neonToggle").classList.toggle("on", neon);
-  $("neonToggle").textContent = neon ? "Неон: ВКЛ" : "Неон: ВЫКЛ";
+  $("neonToggle").textContent = neon ? "НЕОН: ВКЛ" : "НЕОН: ВЫКЛ";
   generate();
 };
 
@@ -194,9 +191,7 @@ function generate() {
     if (p.length === 2) dict[p[0].trim().toLowerCase()] = p[1].trim();
   });
 
-  const glow = neon
-    ? `0 0 18px ${$("glow").value}`
-    : `0 0 0 transparent`;
+  const glow = neon ? `0 0 20px ${$("glow").value}` : `none`;
 
   const inner = `
 <div style="
@@ -217,7 +212,14 @@ function generate() {
     box-shadow:${glow};
     border-radius:${$("radius").value}px;
   ">
-    <div style="opacity:.7;font-size:12px;margin-bottom:8px">
+
+    <div style="text-align:center;margin-bottom:12px">
+      <img src="${$("image").value}"
+        style="width:64px;height:64px;border-radius:50%;
+        box-shadow:0 0 12px ${$("accent").value}">
+    </div>
+
+    <div style="opacity:.6;font-size:12px;margin-bottom:6px">
       SIGNAL INPUT
     </div>
 
@@ -267,6 +269,7 @@ function generate() {
         min-height:36px;
       ">
     </div>
+
   </div>
 </div>
 
