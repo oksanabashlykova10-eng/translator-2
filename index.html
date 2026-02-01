@@ -9,11 +9,10 @@
 
 body {
   margin: 0;
-  font-family: Inter, Arial, sans-serif;
-  background: radial-gradient(circle at top, #1a1c3a, #05060f 70%);
-  color: #fff;
   height: 100vh;
-  overflow: hidden;
+  font-family: Inter, Arial, sans-serif;
+  background: radial-gradient(circle at top, #1b1e2f, #05060f);
+  color: #fff;
 }
 
 /* ===== LAYOUT ===== */
@@ -29,33 +28,32 @@ body {
   overflow-y: auto;
 }
 
-.panel.settings {
-  background: rgba(10,10,20,.9);
+.settings {
+  background: rgba(0,0,0,.55);
   border-right: 1px solid rgba(255,255,255,.08);
 }
 
-.panel.preview {
+.preview {
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 }
 
-.panel.code {
-  background: rgba(10,10,20,.9);
+.code {
+  background: rgba(0,0,0,.55);
   border-left: 1px solid rgba(255,255,255,.08);
 }
 
 /* ===== UI ===== */
 h2 {
-  margin-top: 0;
-  font-size: 20px;
+  margin: 0 0 16px;
 }
 
 label {
   display: block;
   margin-top: 14px;
-  font-size: 13px;
-  opacity: .85;
+  font-size: 14px;
+  opacity: .9;
 }
 
 input, textarea {
@@ -64,50 +62,53 @@ input, textarea {
   margin-top: 6px;
   border-radius: 10px;
   border: none;
-  font-size: 14px;
+  outline: none;
 }
 
 textarea {
   resize: vertical;
-  min-height: 90px;
 }
 
 button {
-  margin-top: 14px;
-  padding: 12px;
+  width: 100%;
+  margin-top: 16px;
+  padding: 14px;
   border-radius: 14px;
   border: none;
   cursor: pointer;
   font-size: 15px;
-}
-
-button.primary {
-  background: linear-gradient(135deg,#ff8a00,#ff5e00);
-  color: #fff;
   font-weight: 600;
 }
 
-button.toggle {
-  background: #2a2d55;
+.primary {
+  background: #ff8a00;
   color: #fff;
 }
 
-button.toggle.on {
-  background: linear-gradient(135deg,#ffb347,#ff8a00);
+.toggle {
+  background: #333;
+  color: #fff;
+}
+
+.toggle.on {
+  background: #ff8a00;
 }
 
 /* ===== PREVIEW ===== */
 iframe {
-  width: 380px;
+  width: 420px;
   height: 420px;
+  border-radius: 26px;
   border: none;
+  background: #111;
+  box-shadow: 0 0 60px rgba(255,138,0,.25);
 }
 
 /* ===== CODE ===== */
 #code {
   width: 100%;
   height: calc(100vh - 60px);
-  background: #0a0c1d;
+  background: #0b0f1a;
   color: #7CFFB2;
   font-family: monospace;
   font-size: 13px;
@@ -121,12 +122,12 @@ iframe {
 
 <div class="app">
 
-  <!-- SETTINGS -->
+  <!-- НАСТРОЙКИ -->
   <div class="panel settings">
-    <h2>🎧 Редактор переводчика</h2>
+    <h2>🎛️ Редактор</h2>
 
     <label>🎨 Цвет карточки</label>
-    <input type="color" id="bg" value="#10131c">
+    <input type="color" id="bg" value="#0f1117">
 
     <label>🎨 Цвет текста</label>
     <input type="color" id="text" value="#ffffff">
@@ -143,8 +144,8 @@ iframe {
     <input type="text" id="image"
       value="https://cdn-icons-png.flaticon.com/512/4712/4712109.png">
 
-    <label>📐 Скругление</label>
-    <input type="number" id="radius" value="24">
+    <label>📐 Скругление (px)</label>
+    <input type="number" id="radius" value="26">
 
     <label>🔠 Размер шрифта</label>
     <input type="number" id="fontSize" value="18">
@@ -153,12 +154,11 @@ iframe {
     <input type="number" id="volume" min="0" max="1" step="0.1" value="0.8">
 
     <label>📘 Слова (en = ru)</label>
-    <textarea id="dict">water = вода
+    <textarea id="dict" rows="6">water = вода
 fire = огонь
 book = книга
 music = музыка
-sun = солнце
-house = дом</textarea>
+sun = солнце</textarea>
 
     <button id="copy" class="primary">📋 Скопировать iframe</button>
   </div>
@@ -177,72 +177,94 @@ house = дом</textarea>
 </div>
 
 <script>
-let neonEnabled = true;
+let neon = true;
+const $ = id => document.getElementById(id);
 
-const preview = document.getElementById("preview");
-const codeBox = document.getElementById("code");
-
-document.getElementById("neonToggle").onclick = () => {
-  neonEnabled = !neonEnabled;
-  const b = neonToggle;
-  b.textContent = neonEnabled ? "✨ Неон: ВКЛ" : "✨ Неон: ВЫКЛ";
-  b.classList.toggle("on", neonEnabled);
+$("neonToggle").onclick = () => {
+  neon = !neon;
+  $("neonToggle").classList.toggle("on", neon);
+  $("neonToggle").textContent = neon ? "✨ Неон: ВКЛ" : "✨ Неон: ВЫКЛ";
   generate();
 };
 
-document.querySelectorAll("input, textarea").forEach(e =>
-  e.addEventListener("input", generate)
-);
+document.querySelectorAll("input, textarea")
+  .forEach(el => el.addEventListener("input", generate));
 
 function generate() {
   const dict = {};
-  dictInput().value.split("\n").forEach(l=>{
-    const p=l.split("="); if(p.length===2)
-    dict[p[0].trim().toLowerCase()]=p[1].trim();
+  $("dict").value.split("\n").forEach(l => {
+    const p = l.split("=");
+    if (p.length === 2) dict[p[0].trim().toLowerCase()] = p[1].trim();
   });
 
-  const shadow = neonEnabled
-    ? `0 0 30px ${glow.value}55`
-    : `0 20px 40px rgba(0,0,0,.4)`;
+  const shadow = neon
+    ? `0 0 40px ${$("glow").value}`
+    : `0 10px 30px rgba(0,0,0,.4)`;
 
   const inner = `
-<div style="display:flex;justify-content:center;align-items:center;height:100%">
+<div style="display:flex;justify-content:center;align-items:center;width:100%;height:100%">
   <div style="
-    background:${bg.value};
-    color:${text.value};
-    padding:24px;
-    border-radius:${radius.value}px;
+    background:${$("bg").value};
+    color:${$("text").value};
     width:360px;
+    padding:22px;
+    border-radius:${$("radius").value}px;
+    box-shadow:${shadow};
     text-align:center;
-    box-shadow:${shadow}">
-    <img src="${image.value}" style="width:72px;height:72px;border-radius:50%">
-    <input id="w" placeholder="Type one English word"
-      style="width:100%;padding:12px;margin-top:12px;border-radius:${radius.value}px;border:none">
-    <button onclick="r.textContent=d[w.value.toLowerCase()]||'Нет перевода'"
-      style="width:100%;padding:14px;margin-top:12px;
-      background:${accent.value};color:#fff;border:none;border-radius:${radius.value}px">
+    font-family:Arial">
+    <img src="${$("image").value}"
+      style="width:72px;height:72px;border-radius:50%;margin-bottom:14px">
+    <input id="word" placeholder="Type one English word"
+      style="width:100%;padding:12px;border-radius:${$("radius").value}px;border:none">
+    <button id="translate"
+      style="width:100%;margin-top:12px;padding:14px;
+      background:${$("accent").value};color:#fff;border:none;
+      border-radius:${$("radius").value}px;font-size:${$("fontSize").value}px">
       Translate
     </button>
-    <div id="r" style="margin-top:12px"></div>
+    <button id="speak"
+      style="width:100%;margin-top:10px;padding:14px;
+      background:${$("accent").value};color:#fff;border:none;
+      border-radius:${$("radius").value}px;font-size:${$("fontSize").value}px">
+      🔊 Speak
+    </button>
+    <div id="result" style="margin-top:14px"></div>
   </div>
 </div>
-<script>const d=${JSON.stringify(dict)}</script>
+
+<script>
+const DICTIONARY = ${JSON.stringify(dict)};
+const VOLUME = ${$("volume").value};
+
+translate.onclick = () => {
+  const v = word.value.trim().toLowerCase();
+  result.textContent = (!v || v.includes(" "))
+    ? "Введите одно слово"
+    : (DICTIONARY[v] || "Нет перевода");
+};
+
+speak.onclick = () => {
+  if (!word.value) return;
+  const u = new SpeechSynthesisUtterance(word.value);
+  u.lang = "en-US";
+  u.volume = VOLUME;
+  speechSynthesis.speak(u);
+};
+<\/script>
 `;
 
-  preview.srcdoc = inner;
-  codeBox.value =
-`<iframe srcdoc="${inner.replace(/"/g,'&quot;')}"
-style="width:960px;height:600px;border:none"></iframe>`;
+  $("preview").srcdoc = inner;
+  $("code").value =
+`<iframe style="width:100%;height:500px;border:none"
+srcdoc="${inner.replace(/"/g,'&quot;')}"></iframe>`;
 }
 
 generate();
 
-document.getElementById("copy").onclick=()=>{
-  navigator.clipboard.writeText(codeBox.value);
+$("copy").onclick = () => {
+  navigator.clipboard.writeText($("code").value);
   alert("Готово ✅");
 };
-
-function dictInput(){return document.getElementById("dict")}
 </script>
 
 </body>
