@@ -1,183 +1,76 @@
-<!doctype html>
-<html lang="ru">
-<head>
-<meta charset="UTF-8">
-<title>Редактор переводчика для Genially</title>
-
-<style>
-* { box-sizing: border-box; }
-
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: radial-gradient(circle at top, #1b1b2b, #05050a);
-  color: #fff;
-  height: 100vh;
-  overflow: hidden;
-}
-
-/* ===== ОСНОВНАЯ СЕТКА ===== */
-.app {
-  display: grid;
-  grid-template-columns: 360px 1fr 420px;
-  height: 100vh;
-}
-
-/* ===== ПАНЕЛИ ===== */
-.panel {
-  padding: 20px;
-  overflow-y: auto;
-}
-
-.panel.settings {
-  background: rgba(10,10,20,0.9);
-  border-right: 1px solid rgba(255,255,255,0.08);
-}
-
-.panel.preview {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.panel.code {
-  background: rgba(10,10,20,0.9);
-  border-left: 1px solid rgba(255,255,255,0.08);
-}
-
-/* ===== UI ===== */
-h2 {
-  margin: 0 0 10px;
-  font-size: 18px;
-}
-
-label {
-  display:block;
-  margin-top:14px;
-  font-size:14px;
-  opacity:.9;
-}
-
-input, textarea {
-  width:100%;
-  padding:8px;
-  margin-top:4px;
-  border-radius:8px;
-  border:none;
-  font-size:14px;
-}
-
-textarea { resize: vertical; }
-
-button {
-  margin-top:14px;
-  padding:12px;
-  border-radius:10px;
-  border:none;
-  cursor:pointer;
-  font-size:15px;
-}
-
-button.primary {
-  background:#ff6a00;
-  color:#fff;
-}
-
-button.toggle {
-  background:#333;
-  color:#fff;
-}
-
-button.toggle.on {
-  background:#ff9f43;
-}
-
-/* ===== PREVIEW ===== */
-iframe#preview {
-  width: 420px;
-  height: 420px;
-  border: none;
-  background: #111;
-  border-radius: 16px;
-}
-
-/* ===== CODE ===== */
-#code {
-  width:100%;
-  height:calc(100vh - 60px);
-  background:#0b0b14;
-  color:#7CFFB2;
-  font-family:monospace;
-  font-size:13px;
-  border-radius:12px;
-  padding:12px;
-}
-</style>
-</head>
-
-<body>
-
-<div class="app">
-
-  <!-- НАСТРОЙКИ -->
-  <div class="panel settings">
-    <h2>🎛️ Настройки</h2>
-
-    <label>🎨 Цвет карточки</label>
-    <input type="color" id="bg" value="#f2f0c9">
-
-    <label>🎨 Цвет текста</label>
-    <input type="color" id="text" value="#000000">
-
-    <label>🔥 Акцентный цвет</label>
-    <input type="color" id="accent" value="#ff7a00">
-
-    <button id="neonToggle" class="toggle on">✨ Неон: ВКЛ</button>
-
-    <label>✨ Цвет неона</label>
-    <input type="color" id="glow" value="#ff9f43">
-
-    <label>🖼️ Картинка (URL)</label>
-    <input type="text" id="image"
-      value="https://cdn-icons-png.flaticon.com/512/4712/4712109.png">
-
-    <label>📐 Скругление (px)</label>
-    <input type="number" id="radius" value="22">
-
-    <label>🔠 Размер шрифта (px)</label>
-    <input type="number" id="fontSize" value="18">
-
-    <label>🔊 Громкость (0–1)</label>
-    <input type="number" id="volume" min="0" max="1" step="0.1" value="0.8">
-
-    <label>📘 Список слов (en = ru)</label>
-    <textarea id="dict" rows="6">water = вода
-fire = огонь
-book = книга
-music = музыка
-sun = солнце
-house = дом</textarea>
-
-    <button id="copy" class="primary">📋 Скопировать iframe</button>
+const inner = `
+<div id="FX_ROOT">
+  <div class="card">
+    <img class="avatar" src="${image}">
+    <input id="word" placeholder="Type one English word">
+    <button id="translate">Translate</button>
+    <button id="speak">🔊 Speak</button>
+    <div class="result" id="result"></div>
   </div>
-
-  <!-- PREVIEW -->
-  <div class="panel preview">
-    <iframe id="preview"></iframe>
-  </div>
-
-  <!-- CODE -->
-  <div class="panel code">
-    <h2>📦 iframe-код</h2>
-    <textarea id="code" readonly></textarea>
-  </div>
-
 </div>
 
-<!-- 🔴 НИЖЕ — ТВОЯ ЛОГИКА БЕЗ ИЗМЕНЕНИЙ -->
-<script>
-/* ⬇⬇⬇ ВЕСЬ ТВОЙ JS ОСТАЁТСЯ ТАКИМ ЖЕ ⬇⬇⬇ */
-</script>
+<style>
+#FX_ROOT {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  width:100%;
+  height:100%;
+  font-family: Arial;
+}
+.card {
+  background:${bg};
+  color:${text};
+  padding:22px;
+  border-radius:${radius}px;
+  width:360px;
+  text-align:center;
+  box-shadow:${shadow};
+}
+.avatar {
+  width:72px;
+  height:72px;
+  border-radius:50%;
+  object-fit:cover;
+  margin-bottom:14px;
+  box-shadow:${avatarGlow};
+}
+.card input,
+.card button {
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border-radius:${radius}px;
+  border:none;
+  font-size:${fontSize}px;
+}
+.card input { background:#fff; }
+.card button {
+  background:${accent};
+  color:#fff;
+  font-weight:bold;
+}
+.result { margin-top:12px; }
+</style>
 
-</body>
-</html>
+<script>
+const DICTIONARY = ${JSON.stringify(dict)};
+const VOLUME = ${volume};
+
+document.getElementById("translate").onclick = () => {
+  const v = document.getElementById("word").value.trim().toLowerCase();
+  document.getElementById("result").textContent =
+    (!v || v.includes(" ")) ? "Введите одно слово" :
+    (DICTIONARY[v] || "Нет перевода");
+};
+
+document.getElementById("speak").onclick = () => {
+  const v = document.getElementById("word").value.trim();
+  if (!v) return;
+  const u = new SpeechSynthesisUtterance(v);
+  u.lang="en-US";
+  u.volume=VOLUME;
+  speechSynthesis.speak(u);
+};
+<\/script>
+`;
