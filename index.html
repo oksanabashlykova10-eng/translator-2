@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Translator Editor</title>
+<title>Translator Widget Editor</title>
 
 <style>
 * { box-sizing: border-box; }
@@ -15,14 +15,12 @@ body {
   color: #e9f0ff;
 }
 
-/* ===== LAYOUT ===== */
 .app {
   display: grid;
   grid-template-columns: 360px 1fr 420px;
   height: 100vh;
 }
 
-/* ===== PANELS ===== */
 .panel {
   padding: 18px;
   overflow-y: auto;
@@ -36,7 +34,6 @@ body {
   align-items: center;
 }
 
-/* ===== UI ===== */
 h2 {
   margin: 0 0 14px;
   font-size: 12px;
@@ -56,8 +53,11 @@ input, textarea {
   width: 100%;
   padding: 9px;
   margin-top: 6px;
-  border-radius: 8px;
-  border: none;
+  border-radius: 6px;
+  border: 1px solid #2e3a6d;
+  background: #050714;
+  color: #e9f0ff;
+  font-size: 13px;
 }
 
 textarea { resize: vertical; }
@@ -66,7 +66,7 @@ button {
   width: 100%;
   margin-top: 14px;
   padding: 12px;
-  border-radius: 999px;
+  border-radius: 6px;
   border: none;
   cursor: pointer;
   font-size: 14px;
@@ -74,35 +74,23 @@ button {
 
 .primary {
   background: #ff8a00;
-  color: #fff;
+  color: #120700;
 }
 
 .toggle {
-  background: #333;
-  color: #fff;
+  background: #0a1030;
+  color: #9fb8ff;
+  border: 1px solid #3a4aa0;
 }
 
 .toggle.on {
-  background: #ff8a00;
+  background: #11ff00;
+  color: #02030a;
 }
 
-/* ===== PREVIEW ===== */
 iframe {
   width: 420px;
   height: 420px;
-  border: none;
-  background: transparent;
-}
-
-/* ===== CODE ===== */
-#code {
-  width: 100%;
-  height: calc(100vh - 60px);
-  background: #02030a;
-  color: #7cffd8;
-  font-family: monospace;
-  font-size: 12px;
-  padding: 12px;
   border: none;
 }
 </style>
@@ -116,14 +104,8 @@ iframe {
 <div class="panel">
   <h2>Editor</h2>
 
-  <label>Background (outside)</label>
-  <input type="color" id="bgOuter" value="#1a1a1a">
-
   <label>Card color</label>
-  <input type="color" id="bgCard" value="#f6f2cc">
-
-  <label>Input background</label>
-  <input type="color" id="bgInput" value="#ffffff">
+  <input type="color" id="cardBg" value="#f6f1c9">
 
   <label>Text color</label>
   <input type="color" id="text" value="#333333">
@@ -140,7 +122,7 @@ iframe {
   <input type="text" id="image"
     value="https://cdn-icons-png.flaticon.com/512/4712/4712109.png">
 
-  <label>Corner radius</label>
+  <label>Corner radius (px)</label>
   <input type="number" id="radius" value="22">
 
   <label>Volume (0–1)</label>
@@ -152,7 +134,7 @@ fire = огонь
 book = книга
 music = музыка</textarea>
 
-  <button id="copy" class="primary">Copy iframe</button>
+  <button id="copy" class="primary">📋 Copy iframe</button>
 </div>
 
 <!-- PREVIEW -->
@@ -162,7 +144,7 @@ music = музыка</textarea>
 
 <!-- CODE -->
 <div class="panel">
-  <h2>iframe</h2>
+  <h2>IFRAME</h2>
   <textarea id="code" readonly></textarea>
 </div>
 
@@ -180,19 +162,16 @@ $("neonToggle").onclick = () => {
 };
 
 document.querySelectorAll("input, textarea")
-  .forEach(e => e.addEventListener("input", generate));
+  .forEach(el => el.addEventListener("input", generate));
 
 function generate() {
-
   const dict = {};
   $("dict").value.split("\n").forEach(l => {
     const p = l.split("=");
     if (p.length === 2) dict[p[0].trim().toLowerCase()] = p[1].trim();
   });
 
-  const glow = neon
-    ? `0 0 30px ${$("glow").value}`
-    : `none`;
+  const glow = neon ? `0 0 35px ${$("glow").value}` : "none";
 
   const inner = `
 <div style="
@@ -201,13 +180,12 @@ function generate() {
   display:flex;
   justify-content:center;
   align-items:center;
-  background:${$("bgOuter").value};
-  font-family:Arial;
+  font-family:Inter,Arial,sans-serif;
 ">
   <div style="
     width:360px;
     padding:22px;
-    background:${$("bgCard").value};
+    background:${$("cardBg").value};
     color:${$("text").value};
     border-radius:${$("radius").value}px;
     box-shadow:${glow};
@@ -224,18 +202,18 @@ function generate() {
         padding:12px;
         border-radius:${$("radius").value}px;
         border:none;
-        background:${$("bgInput").value};
+        margin-bottom:12px;
       ">
 
     <button id="translate"
       style="
         width:100%;
-        margin-top:12px;
-        padding:12px;
+        padding:14px;
         background:${$("accent").value};
-        color:#fff;
+        color:white;
         border:none;
         border-radius:${$("radius").value}px;
+        font-size:16px;
       ">
       Translate
     </button>
@@ -244,27 +222,27 @@ function generate() {
       style="
         width:100%;
         margin-top:10px;
-        padding:12px;
+        padding:14px;
         background:${$("accent").value};
-        color:#fff;
+        color:white;
         border:none;
         border-radius:${$("radius").value}px;
+        font-size:16px;
       ">
       🔊 Speak
     </button>
 
-    <div id="result" style="margin-top:14px"></div>
-
+    <div id="result" style="margin-top:12px"></div>
   </div>
 </div>
 
 <script>
-const DICTIONARY = ${JSON.stringify(dict)};
+const DICT = ${JSON.stringify(dict)};
 const VOLUME = ${$("volume").value};
 
 translate.onclick = () => {
   const v = word.value.trim().toLowerCase();
-  result.textContent = DICTIONARY[v] || "Введите одно слово";
+  result.textContent = DICT[v] || "";
 };
 
 speak.onclick = () => {
@@ -287,7 +265,7 @@ generate();
 
 $("copy").onclick = () => {
   navigator.clipboard.writeText($("code").value);
-  alert("Copied");
+  alert("Copied ✅");
 };
 </script>
 
