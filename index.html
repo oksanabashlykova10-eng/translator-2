@@ -5,99 +5,151 @@
 <title>Редактор переводчика для Genially</title>
 
 <style>
-* { box-sizing: border-box; }
+*{box-sizing:border-box}
 
-body {
-  margin: 0;
-  height: 100vh;
-  font-family: Inter, Arial, sans-serif;
-  background: radial-gradient(circle at top, #1b1e2f, #05060f);
-  color: #fff;
+body{
+  margin:0;
+  height:100vh;
+  font-family:Inter,Arial,sans-serif;
+  background:radial-gradient(circle at top,#1a1f3a,#05060f);
+  color:#fff;
+  overflow:hidden;
 }
 
 /* ===== LAYOUT ===== */
-.app {
-  display: grid;
-  grid-template-columns: 360px 1fr 420px;
-  height: 100vh;
+.app{
+  display:grid;
+  grid-template-columns:360px 1fr 420px;
+  height:100vh;
+  gap:18px;
+  padding:18px;
 }
 
 /* ===== PANELS ===== */
-.panel {
-  padding: 20px;
-  overflow-y: auto;
+.panel{
+  position:relative;
+  padding:18px;
+  border-radius:16px;
+  background:linear-gradient(145deg,#090c23,#131633);
+  box-shadow:
+    0 0 0 1px rgba(102,153,255,.25),
+    0 22px 40px rgba(0,0,0,.65);
+  overflow:hidden;
 }
 
-.settings {
-  background: rgba(0,0,0,.55);
-  border-right: 1px solid rgba(255,255,255,.08);
+.panel::before{
+  content:"";
+  position:absolute;
+  inset:-40%;
+  background:
+    radial-gradient(circle at 0 0, rgba(148,255,223,.18) 0, transparent 55%),
+    radial-gradient(circle at 100% 100%, rgba(125,158,255,.18) 0, transparent 55%);
+  mix-blend-mode:screen;
+  pointer-events:none;
 }
 
-.preview {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+.panel>*{position:relative;z-index:1}
 
-.code {
-  background: rgba(0,0,0,.55);
-  border-left: 1px solid rgba(255,255,255,.08);
-}
+.settings{overflow-y:auto}
+.preview{display:flex;align-items:center;justify-content:center}
+.code{overflow:hidden}
 
 /* ===== UI ===== */
-h2 { margin: 0 0 16px; }
+h2{
+  margin:0 0 14px;
+  font-size:.9rem;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:#f2f6ff;
+  text-shadow:0 0 14px #6df2ff;
+}
 
-label {
+label{
   display:block;
   margin-top:14px;
-  font-size:14px;
-  opacity:.9;
+  font-size:.75rem;
+  letter-spacing:.06em;
+  opacity:.85;
 }
 
-input, textarea {
+input,textarea{
   width:100%;
-  padding:10px;
+  padding:9px 10px;
   margin-top:6px;
-  border-radius:10px;
-  border:none;
+  border-radius:8px;
+  border:1px solid #353863;
+  background:#050712;
+  color:#f5f7ff;
+  font-size:.85rem;
+  outline:none;
+  transition:.15s;
 }
 
-textarea { resize: vertical; }
+input:focus,textarea:focus{
+  border-color:#63f2ff;
+  box-shadow:0 0 0 1px rgba(99,242,255,.55);
+  background:#040716;
+}
 
-button {
+textarea{resize:vertical}
+
+button{
   width:100%;
   margin-top:16px;
   padding:14px;
-  border-radius:14px;
+  border-radius:999px;
   border:none;
   cursor:pointer;
-  font-size:15px;
+  font-size:.75rem;
+  letter-spacing:.12em;
+  text-transform:uppercase;
   font-weight:600;
 }
 
-.primary { background:#ff8a00; color:#fff; }
-.toggle { background:#333; color:#fff; }
-.toggle.on { background:#ff8a00; }
+.primary{
+  background:linear-gradient(135deg,#4af2c5,#63f2ff);
+  color:#041013;
+  box-shadow:0 0 18px rgba(74,242,197,.55);
+}
+
+.primary:hover{
+  box-shadow:0 0 26px rgba(99,242,255,.75);
+}
+
+.toggle{
+  background:#1a1f3a;
+  color:#9ef6ff;
+  border:1px solid #3b3f74;
+}
+
+.toggle.on{
+  background:linear-gradient(135deg,#ffb347,#ff7b00);
+  color:#180c00;
+  box-shadow:0 0 20px rgba(255,140,0,.6);
+}
 
 /* ===== PREVIEW ===== */
-iframe {
+iframe{
   width:420px;
   height:420px;
   border:none;
-  border-radius:26px;
-  background:#111;
-  box-shadow:0 0 60px rgba(255,138,0,.25);
+  border-radius:22px;
+  background:#050712;
+  box-shadow:
+    0 0 0 1px rgba(102,153,255,.25),
+    0 20px 36px rgba(0,0,0,.8);
 }
 
 /* ===== CODE ===== */
-#code {
+#code{
   width:100%;
-  height:calc(100vh - 60px);
-  background:#0b0f1a;
-  color:#7CFFB2;
+  height:100%;
+  background:#050712;
+  color:#7cffd8;
   font-family:monospace;
-  font-size:13px;
-  border-radius:14px;
+  font-size:12px;
+  border:none;
+  border-radius:12px;
   padding:14px;
 }
 </style>
@@ -107,44 +159,44 @@ iframe {
 
 <div class="app">
 
-  <!-- НАСТРОЙКИ -->
+  <!-- SETTINGS -->
   <div class="panel settings">
-    <h2>🎛️ Редактор</h2>
+    <h2>Настройки</h2>
 
-    <label>🎨 Цвет карточки</label>
+    <label>Цвет карточки</label>
     <input type="color" id="bg" value="#0f1117">
 
-    <label>🎨 Цвет текста</label>
+    <label>Цвет текста</label>
     <input type="color" id="text" value="#ffffff">
 
-    <label>🔥 Акцентный цвет</label>
+    <label>Акцентный цвет</label>
     <input type="color" id="accent" value="#ff8a00">
 
-    <button id="neonToggle" class="toggle on">✨ Неон: ВКЛ</button>
+    <button id="neonToggle" class="toggle on">Неон: ВКЛ</button>
 
-    <label>✨ Цвет неона</label>
+    <label>Цвет неона</label>
     <input type="color" id="glow" value="#ff8a00">
 
-    <label>🖼️ Картинка (URL)</label>
-    <input type="text" id="image"
-      value="https://cdn-icons-png.flaticon.com/512/4712/4712109.png">
+    <label>Картинка (URL)</label>
+    <input type="text" id="image" value="https://cdn-icons-png.flaticon.com/512/4712/4712109.png">
 
-    <label>📐 Скругление (px)</label>
+    <label>Скругление (px)</label>
     <input type="number" id="radius" value="26">
 
-    <label>🔠 Размер шрифта</label>
+    <label>Размер шрифта</label>
     <input type="number" id="fontSize" value="18">
 
-    <label>🔊 Громкость</label>
+    <label>Громкость</label>
     <input type="number" id="volume" min="0" max="1" step="0.1" value="0.8">
 
-    <label>📘 Слова (en = ru)</label>
+    <label>Слова (en = ru)</label>
     <textarea id="dict" rows="6">water = вода
 fire = огонь
 book = книга
-music = музыка</textarea>
+music = музыка
+sun = солнце</textarea>
 
-    <button id="copy" class="primary">📋 Скопировать iframe</button>
+    <button id="copy" class="primary">Скопировать iframe</button>
   </div>
 
   <!-- PREVIEW -->
@@ -154,38 +206,38 @@ music = музыка</textarea>
 
   <!-- CODE -->
   <div class="panel code">
-    <h2>📦 iframe-код</h2>
+    <h2>iframe-код</h2>
     <textarea id="code" readonly></textarea>
   </div>
 
 </div>
 
 <script>
-let neon = true;
-const $ = id => document.getElementById(id);
+let neon=true;
+const $=id=>document.getElementById(id);
 
-$("neonToggle").onclick = () => {
-  neon = !neon;
-  $("neonToggle").classList.toggle("on", neon);
-  $("neonToggle").textContent = neon ? "✨ Неон: ВКЛ" : "✨ Неон: ВЫКЛ";
+$("neonToggle").onclick=()=>{
+  neon=!neon;
+  $("neonToggle").classList.toggle("on",neon);
+  $("neonToggle").textContent=neon?"Неон: ВКЛ":"Неон: ВЫКЛ";
   generate();
 };
 
-document.querySelectorAll("input, textarea")
-  .forEach(el => el.addEventListener("input", generate));
+document.querySelectorAll("input,textarea")
+  .forEach(e=>e.addEventListener("input",generate));
 
-function generate() {
-  const dict = {};
-  $("dict").value.split("\n").forEach(l => {
-    const p = l.split("=");
-    if (p.length === 2) dict[p[0].trim().toLowerCase()] = p[1].trim();
+function generate(){
+  const dict={};
+  $("dict").value.split("\n").forEach(l=>{
+    const p=l.split("=");
+    if(p.length===2)dict[p[0].trim().toLowerCase()]=p[1].trim();
   });
 
-  const shadow = neon
-    ? `0 0 40px ${$("glow").value}`
-    : `0 10px 30px rgba(0,0,0,.4)`;
+  const shadow=neon
+    ?`0 0 40px ${$("glow").value}`
+    :`0 10px 30px rgba(0,0,0,.4)`;
 
-  const inner = `
+  const inner=`
 <div style="display:flex;justify-content:center;align-items:center;width:100%;height:100%">
   <div style="
     background:${$("bg").value};
@@ -217,37 +269,37 @@ function generate() {
 </div>
 
 <script>
-const DICTIONARY = ${JSON.stringify(dict)};
-const VOLUME = ${$("volume").value};
+const DICTIONARY=${JSON.stringify(dict)};
+const VOLUME=${$("volume").value};
 
-translate.onclick = () => {
-  const v = word.value.trim().toLowerCase();
-  result.textContent = (!v || v.includes(" "))
-    ? "Введите одно слово"
-    : (DICTIONARY[v] || "Нет перевода");
+translate.onclick=()=>{
+  const v=word.value.trim().toLowerCase();
+  result.textContent=(!v||v.includes(" "))
+    ?"Введите одно слово"
+    :(DICTIONARY[v]||"Нет перевода");
 };
 
-speak.onclick = () => {
-  if (!word.value) return;
-  const u = new SpeechSynthesisUtterance(word.value);
-  u.lang = "en-US";
-  u.volume = VOLUME;
+speak.onclick=()=>{
+  if(!word.value)return;
+  const u=new SpeechSynthesisUtterance(word.value);
+  u.lang="en-US";
+  u.volume=VOLUME;
   speechSynthesis.speak(u);
 };
 <\/script>
 `;
 
-  $("preview").srcdoc = inner;
-  $("code").value =
-`<iframe srcdoc="${inner.replace(/"/g,'&quot;')}"
+  $("preview").srcdoc=inner;
+  $("code").value=
+`<iframe srcdoc="${inner.replace(/"/g,"&quot;")}"
 style="width:100%;height:500px;border:none"></iframe>`;
 }
 
 generate();
 
-$("copy").onclick = () => {
+$("copy").onclick=()=>{
   navigator.clipboard.writeText($("code").value);
-  alert("Готово ✅");
+  alert("Готово");
 };
 </script>
 
